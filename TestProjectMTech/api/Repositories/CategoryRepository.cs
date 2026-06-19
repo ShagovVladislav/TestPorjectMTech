@@ -24,14 +24,14 @@ public class CategoryRepository : ICategoryRepository
 
     public async Task<Category> CreateCategory(Category category)
     {
-        _dbContext.Add(category.ToModel());
+        var savedCategory = _dbContext.Add(category.ToModel()).Entity;
         
         await _dbContext.SaveChangesAsync();
         
-        var savedCategory = await _dbContext.Categories.FirstOrDefaultAsync(c => c.Id == category.Id);
+        var result = await _dbContext.Categories.FirstOrDefaultAsync(c => c.Id == savedCategory.Id);
         
-        return savedCategory == null 
+        return result == null 
             ? throw new Exception("Category not found") 
-            : savedCategory.ToDomain();
+            : result.ToDomain();
     }
 }
