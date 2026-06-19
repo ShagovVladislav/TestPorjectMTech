@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestPorjectMTech", "TestPorjectMTech\TestPorjectMTech.csproj", "{29F20365-6458-49F8-A224-DA58301C5EF6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestProjectMTech", "TestProjectMTech\TestProjectMTech.csproj", "{29F20365-6458-49F8-A224-DA58301C5EF6}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{1997FFE3-869A-4355-BDB1-353506BB820F}"
 	ProjectSection(SolutionItems) = preProject
