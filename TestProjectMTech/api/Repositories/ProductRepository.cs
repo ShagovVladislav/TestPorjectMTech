@@ -3,6 +3,7 @@ using TestProjectMTech.api.Data;
 using TestProjectMTech.api.Data.Models.Mappers;
 using TestProjectMTech.api.Domain;
 using TestProjectMTech.api.DTO.Requests;
+using TestProjectMTech.api.Exceptions;
 using TestProjectMTech.api.Repositories.Interfaces;
 
 namespace TestProjectMTech.api.Repositories;
@@ -41,6 +42,14 @@ public class ProductRepository : IProductRepository
 
     public async Task<Product> CreateProduct(Product product)
     {
+        var categoryExists = await _dbContext.Categories.AnyAsync(c => c.Id == product.CategoryId);
+        if (!categoryExists)
+            throw new NotFoundException($"Category with id {product.CategoryId} was not found");
+        
+        var skuExists = await _dbContext.Products.AnyAsync(p => p.Sku == product.Sku);
+        if (skuExists)
+            throw new ConflictException($"Product with SKU '{product.Sku}' already exists");
+        
         var savedProduct = (await _dbContext.AddAsync(product.ToModel())).Entity;
         
         await _dbContext.SaveChangesAsync();
@@ -52,7 +61,7 @@ public class ProductRepository : IProductRepository
         var productToUpdate = await _dbContext.Products.FindAsync(id);
 
         if (productToUpdate == null)
-            throw new Exception("not found");
+            throw new NotFoundException($"Product with id {id} was not found");
         
         productToUpdate.ChangeStatus(status);
         

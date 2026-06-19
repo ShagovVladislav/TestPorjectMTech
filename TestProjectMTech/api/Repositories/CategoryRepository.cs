@@ -28,10 +28,6 @@ public class CategoryRepository : ICategoryRepository
         
         await _dbContext.SaveChangesAsync();
         
-        var result = await _dbContext.Categories.FirstOrDefaultAsync(c => c.Id == savedCategory.Id);
-        
-        return result == null 
-            ? throw new Exception("Category not found") 
-            : result.ToDomain();
+        return savedCategory.ToDomain();
     }
 }

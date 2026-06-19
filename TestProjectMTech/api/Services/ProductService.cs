@@ -1,5 +1,6 @@
 ﻿using TestProjectMTech.api.Domain;
 using TestProjectMTech.api.DTO.Requests;
+using TestProjectMTech.api.Exceptions;
 using TestProjectMTech.api.Repositories.Interfaces;
 using TestProjectMTech.api.Services.Interfaces;
 
@@ -21,17 +22,20 @@ public class ProductService : IProductService
         return products;
     }
 
-    public async Task<Product?> GetProductById(int id)
+    public async Task<Product> GetProductById(int id)
     {
         var product = await _productRepository.GetProductById(id);
         
-        return product;
+        return product ?? throw new NotFoundException($"Product with id {id} was not found");
     }
 
     public async Task<Product> CreateProduct(CreateProductRequest request)
     {
-        if (string.IsNullOrEmpty(request.Name) || string.IsNullOrEmpty(request.SKU))
-            throw new Exception("Name and SKU must not be empty");
+        if (string.IsNullOrWhiteSpace(request.Name) || string.IsNullOrWhiteSpace(request.SKU))
+            throw new ValidationException("Name and SKU must not be empty");
+        
+        if (request.CategoryId <= 0)
+            throw new ValidationException("CategoryId must be greater than zero");
         
         var product = new Product
         {

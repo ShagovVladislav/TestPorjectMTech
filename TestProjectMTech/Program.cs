@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
 using TestProjectMTech.api.Data;
+using TestProjectMTech.api.Middleware;
 using TestProjectMTech.api.Repositories;
 using TestProjectMTech.api.Repositories.Interfaces;
 using TestProjectMTech.api.Services;
@@ -34,6 +35,7 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseHttpsRedirection();
 app.MapControllers();
 

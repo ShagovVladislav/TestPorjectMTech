@@ -1,5 +1,7 @@
 ﻿using TestProjectMTech.api.Domain;
 
+using TestProjectMTech.api.Exceptions;
+
 namespace TestProjectMTech.api.Data.Models;
 
 public class ProductModel
@@ -21,7 +23,7 @@ public class ProductModel
         };
         
         if (!transitionAllowed)
-            throw new Exception("can't change status");
+            throw new InvalidStatusTransitionException(Status, newStatus);
         
         Status = newStatus;
     }

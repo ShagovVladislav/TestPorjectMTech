@@ -1,5 +1,6 @@
 ﻿using TestProjectMTech.api.Domain;
 using TestProjectMTech.api.DTO.Requests;
+using TestProjectMTech.api.Exceptions;
 using TestProjectMTech.api.Repositories.Interfaces;
 using TestProjectMTech.api.Services.Interfaces;
 
@@ -23,6 +24,9 @@ public class CategoryService : ICategoryService
 
     public async Task<Category> CreateCategory(CreateCategoryRequest categoryRequest)
     {
+        if (string.IsNullOrWhiteSpace(categoryRequest.Name))
+            throw new ValidationException("Category name must not be empty");
+        
         var category = new Category{ Name = categoryRequest.Name };
         var result = await _categoryRepository.CreateCategory(category);
         
