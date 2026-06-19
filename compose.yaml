@@ -1,0 +1,20 @@
+﻿services:
+  testprojectmtech:
+    image: testprojectmtech
+    build:
+      context: .
+      dockerfile: TestProjectMTech/Dockerfile
+  postgres:
+    image: postgres:16
+    container_name: mtech-postgres
+    environment:
+      POSTGRES_DB: warehouse_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5000:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
