@@ -1,6 +1,37 @@
-﻿namespace TestProjectMTech.api.Repositories;
+﻿using Microsoft.EntityFrameworkCore;
+using TestProjectMTech.api.Data;
+using TestProjectMTech.api.Data.Models.Mappers;
+using TestProjectMTech.api.Domain;
+using TestProjectMTech.api.Repositories.Interfaces;
 
-public class CategoryRepository
+namespace TestProjectMTech.api.Repositories;
+
+public class CategoryRepository : ICategoryRepository
 {
-    
+    private readonly WarehouseDbContext _dbContext;
+
+    public CategoryRepository(WarehouseDbContext dbContext)
+    {
+        _dbContext = dbContext;
+    }
+
+    public async Task<List<Category>> GetAllCategories()
+    {
+        var categories = await _dbContext.Categories.Select(c => c.ToDomain()).ToListAsync();
+        
+        return categories;
+    }
+
+    public async Task<Category> CreateCategory(Category category)
+    {
+        _dbContext.Add(category.ToModel());
+        
+        await _dbContext.SaveChangesAsync();
+        
+        var savedCategory = await _dbContext.Categories.FirstOrDefaultAsync(c => c.Id == category.Id);
+        
+        return savedCategory == null 
+            ? throw new Exception("Category not found") 
+            : savedCategory.ToDomain();
+    }
 }
