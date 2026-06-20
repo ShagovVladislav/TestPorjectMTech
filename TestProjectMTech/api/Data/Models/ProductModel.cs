@@ -15,6 +15,8 @@ public class ProductModel
 
     public void ChangeStatus(Status newStatus)
     {
+        if (Status == newStatus) return;
+        
         var transitionAllowed = (Status, newStatus) switch
         {
             (Status.Active, Status.Defective) => true,

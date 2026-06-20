@@ -17,7 +17,10 @@ public class CategoryRepository : ICategoryRepository
 
     public async Task<List<Category>> GetAllCategories()
     {
-        var categories = await _dbContext.Categories.Select(c => c.ToDomain()).ToListAsync();
+        var categories = await _dbContext.Categories
+            .AsNoTracking()
+            .Select(c => c.ToDomain())
+            .ToListAsync();
         
         return categories;
     }

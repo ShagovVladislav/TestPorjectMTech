@@ -41,7 +41,7 @@ public class ProductService : IProductService
         {
             Name = request.Name,
             CategoryId =  request.CategoryId,
-            Status = request.Status,
+            Status = Status.Active,
             Sku = request.SKU
         };
         

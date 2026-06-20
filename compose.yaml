@@ -1,5 +1,11 @@
 ﻿services:
   testprojectmtech:
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    environment:
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=warehouse_db;Username=postgres;Password=postgres"
     image: testprojectmtech
     build:
       context: .

@@ -35,7 +35,9 @@ public class ProductRepository : IProductRepository
 
     public async Task<Product?> GetProductById(int id)
     {
-        var product = await _dbContext.Products.FirstOrDefaultAsync(p => p.Id == id);
+        var product = await _dbContext.Products
+            .AsNoTracking()
+            .FirstOrDefaultAsync(p => p.Id == id);
         
         return product?.ToDomain();
     }
@@ -50,7 +52,7 @@ public class ProductRepository : IProductRepository
         if (skuExists)
             throw new ConflictException($"Product with SKU '{product.Sku}' already exists");
         
-        var savedProduct = (await _dbContext.AddAsync(product.ToModel())).Entity;
+        var savedProduct = _dbContext.Add(product.ToModel()).Entity;
         
         await _dbContext.SaveChangesAsync();
         return savedProduct.ToDomain();

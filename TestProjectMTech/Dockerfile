@@ -7,10 +7,10 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["TestPorjectMTech/TestPorjectMTech.csproj", "TestPorjectMTech/"]
+COPY ["TestProjectMTech/TestProjectMTech.csproj", "TestProjectMTech/"]
 RUN dotnet restore "TestProjectMTech/TestProjectMTech.csproj"
 COPY . .
-WORKDIR "/src/TestPorjectMTech"
+WORKDIR "/src/TestProjectMTech"
 RUN dotnet build "./TestProjectMTech.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
@@ -20,4 +20,4 @@ RUN dotnet publish "./TestProjectMTech.csproj" -c $BUILD_CONFIGURATION -o /app/p
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "TestPorjectMTech.dll"]
+ENTRYPOINT ["dotnet", "TestProjectMTech.dll"]
