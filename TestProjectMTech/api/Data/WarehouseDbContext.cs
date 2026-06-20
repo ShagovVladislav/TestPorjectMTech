@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using TestProjectMTech.api.Constants;
 using TestProjectMTech.api.Data.Models;
 using TestProjectMTech.api.Domain;
 
@@ -11,9 +12,9 @@ public class WarehouseDbContext : DbContext
         : base(options)
     {}
     
-    public DbSet<CategoryModel>  Categories => Set<CategoryModel>();
+    public DbSet<CategoryModel> Categories => Set<CategoryModel>();
     
-    public DbSet<ProductModel>  Products => Set<ProductModel>();
+    public DbSet<ProductModel> Products => Set<ProductModel>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -37,11 +38,11 @@ public class WarehouseDbContext : DbContext
 
             builder.Property(product => product.Name)
                 .IsRequired()
-                .HasMaxLength(200);
+                .HasMaxLength(RequestStringConstants.ProductNameMaxLength);
 
             builder.Property(product => product.Sku)
                 .IsRequired()
-                .HasMaxLength(100);
+                .HasMaxLength(RequestStringConstants.SkuNameMaxLength);
 
             builder.HasIndex(product => product.Sku)
                 .IsUnique();
@@ -49,14 +50,13 @@ public class WarehouseDbContext : DbContext
             builder.Property(product => product.Status)
                 .IsRequired()
                 .HasConversion<string>()
-                .HasMaxLength(20);
+                .HasMaxLength(RequestStringConstants.ProductStatusMaxLength);
             
             builder.HasOne(product => product.Category)
                 .WithMany(category => category.Products)
                 .HasForeignKey(product => product.CategoryId)
                 .OnDelete(DeleteBehavior.Restrict);
         });
-        
     }
 
     private static void ConfigureCategory(ModelBuilder modelBuilder)
@@ -72,8 +72,8 @@ public class WarehouseDbContext : DbContext
 
             builder.Property(category => category.Name)
                 .IsRequired()
-                .HasMaxLength(100);
-        });    
+                .HasMaxLength(RequestStringConstants.CategoryNameMaxLength);
+        });
     }
     
     private static void SeedData(ModelBuilder modelBuilder)
@@ -135,6 +135,6 @@ public class WarehouseDbContext : DbContext
                 Sku = "LAPTOP-LENOVO-001",
                 CategoryId = 3,
                 Status = Status.Defective
-            });    
+            });
     }
 }

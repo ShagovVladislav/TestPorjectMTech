@@ -17,33 +17,33 @@ public class ProductControllers : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<List<Product>>> GetAllProducts([FromQuery] GetProductsFilters filters)
+    public async Task<ActionResult<List<Product>>> GetAllProducts([FromQuery] GetProductsFilters filters, CancellationToken cancellationToken)
     {
-        var product = await _productService.GetProducts(filters);
+        var product = await _productService.GetProducts(filters, cancellationToken);
         
         return Ok(product);
     }
     
     [HttpGet("{id:int}")]
-    public async Task<ActionResult<Product>> GetProductById([FromRoute] int id)
+    public async Task<ActionResult<Product>> GetProductById([FromRoute] int id, CancellationToken cancellationToken)
     {
-        var product = await _productService.GetProductById(id);
+        var product = await _productService.GetProductById(id, cancellationToken);
 
         return Ok(product);
     }
 
     [HttpPost]
-    public async Task<ActionResult<Product>> CreateProduct(CreateProductRequest productRequest)
+    public async Task<ActionResult<Product>> CreateProduct(CreateProductRequest productRequest, CancellationToken cancellationToken)
     {
-        var product = await _productService.CreateProduct(productRequest);
+        var product = await _productService.CreateProduct(productRequest, cancellationToken);
         
         return Ok(product);
     }
     
     [HttpPut("{id:int}/status")]
-    public async Task<ActionResult<Product>> ChangeProductStatus([FromRoute] int id, Status status)
+    public async Task<ActionResult<Product>> ChangeProductStatus([FromRoute] int id, Status status, CancellationToken cancellationToken)
     {
-        var product = await _productService.ChangeStatus(id, status);
+        var product = await _productService.ChangeStatus(id, status, cancellationToken);
         
         return Ok(product); 
     }

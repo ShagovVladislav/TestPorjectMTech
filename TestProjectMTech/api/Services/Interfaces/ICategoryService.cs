@@ -5,6 +5,6 @@ namespace TestProjectMTech.api.Services.Interfaces;
 
 public interface ICategoryService
 {
-    Task<List<Category>> GetAllCategories();
-    Task<Category> CreateCategory(CreateCategoryRequest categoryRequest);
+    Task<List<Category>> GetAllCategories(CancellationToken cancellationToken);
+    Task<Category> CreateCategory(CreateCategoryRequest categoryRequest, CancellationToken cancellationToken);
 }

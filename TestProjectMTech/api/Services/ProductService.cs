@@ -15,21 +15,21 @@ public class ProductService : IProductService
         _productRepository = productRepository;
     }
 
-    public async Task<List<Product>> GetProducts(GetProductsFilters filters)
+    public async Task<List<Product>> GetProducts(GetProductsFilters filters, CancellationToken cancellationToken)
     {
-        var products = await _productRepository.GetProducts(filters);
+        var products = await _productRepository.GetProducts(filters, cancellationToken);
         
         return products;
     }
 
-    public async Task<Product> GetProductById(int id)
+    public async Task<Product> GetProductById(int id, CancellationToken cancellationToken)
     {
-        var product = await _productRepository.GetProductById(id);
+        var product = await _productRepository.GetProductById(id, cancellationToken);
         
         return product ?? throw new NotFoundException($"Product with id {id} was not found");
     }
 
-    public async Task<Product> CreateProduct(CreateProductRequest request)
+    public async Task<Product> CreateProduct(CreateProductRequest request, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(request.Name) || string.IsNullOrWhiteSpace(request.SKU))
             throw new ValidationException("Name and SKU must not be empty");
@@ -45,12 +45,12 @@ public class ProductService : IProductService
             Sku = request.SKU
         };
         
-        return await _productRepository.CreateProduct(product);
+        return await _productRepository.CreateProduct(product, cancellationToken);
     }
 
-    public async Task<Product> ChangeStatus(int id, Status status)
+    public async Task<Product> ChangeStatus(int id, Status status, CancellationToken cancellationToken)
     {
-        var updatedProduct = await _productRepository.ChangeStatus(id, status);
+        var updatedProduct = await _productRepository.ChangeStatus(id, status, cancellationToken);
         
         return updatedProduct;
     }

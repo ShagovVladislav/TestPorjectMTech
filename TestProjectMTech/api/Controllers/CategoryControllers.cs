@@ -17,17 +17,17 @@ public class CategoryControllers : ControllerBase
     }
     
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Category>>> GetCategories()
+    public async Task<ActionResult<IEnumerable<Category>>> GetCategories(CancellationToken cancellationToken)
     {
-        var categories = await _categoryService.GetAllCategories();
+        var categories = await _categoryService.GetAllCategories(cancellationToken);
         
         return Ok(categories);
     }
 
     [HttpPost]
-    public async Task<ActionResult<Category>> CreateCategory(CreateCategoryRequest category)
+    public async Task<ActionResult<Category>> CreateCategory(CreateCategoryRequest category, CancellationToken cancellationToken)
     {
-        var categoryResponse = await _categoryService.CreateCategory(category);
+        var categoryResponse = await _categoryService.CreateCategory(category, cancellationToken);
         
         return Ok(categoryResponse);
     }

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using TestProjectMTech.api.Data;
 using TestProjectMTech.api.Data.Models.Mappers;
 using TestProjectMTech.api.Domain;
@@ -17,57 +18,73 @@ public class ProductRepository : IProductRepository
         _dbContext = dbContext;
     }
 
-    public async Task<List<Product>> GetProducts(GetProductsFilters filters)
+    public async Task<List<Product>> GetProducts(GetProductsFilters filters, CancellationToken cancellationToken)
     {
         var products = _dbContext.Products
             .AsNoTracking();
         
         if (filters.categoryId.HasValue)
-            products = products.Where(p => p.CategoryId ==  filters.categoryId);
+            products = products.Where(p => p.CategoryId == filters.categoryId);
 
         if (filters.status.HasValue)
             products = products.Where(p => p.Status == filters.status);
 
-        var result = (await products.ToListAsync()).Select(p => p.ToDomain()).ToList();
+        var result = (await products.ToListAsync(cancellationToken)).Select(p => p.ToDomain()).ToList();
         
         return result;
     }
 
-    public async Task<Product?> GetProductById(int id)
+    public async Task<Product?> GetProductById(int id, CancellationToken cancellationToken)
     {
         var product = await _dbContext.Products
             .AsNoTracking()
-            .FirstOrDefaultAsync(p => p.Id == id);
+            .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
         
         return product?.ToDomain();
     }
 
-    public async Task<Product> CreateProduct(Product product)
+    public async Task<Product> CreateProduct(Product product, CancellationToken cancellationToken)
     {
-        var categoryExists = await _dbContext.Categories.AnyAsync(c => c.Id == product.CategoryId);
+        var categoryExists = await _dbContext.Categories.AnyAsync(c => c.Id == product.CategoryId, cancellationToken);
+        
         if (!categoryExists)
             throw new NotFoundException($"Category with id {product.CategoryId} was not found");
         
-        var skuExists = await _dbContext.Products.AnyAsync(p => p.Sku == product.Sku);
+        var skuExists = await _dbContext.Products.AnyAsync(
+            p => p.Sku == product.Sku,
+            cancellationToken);
+        
         if (skuExists)
             throw new ConflictException($"Product with SKU '{product.Sku}' already exists");
         
         var savedProduct = _dbContext.Add(product.ToModel()).Entity;
         
-        await _dbContext.SaveChangesAsync();
+        try
+        {
+            await _dbContext.SaveChangesAsync(cancellationToken);
+        }
+        catch (DbUpdateException exception)
+            when (exception.InnerException is PostgresException { SqlState: PostgresErrorCodes.UniqueViolation })
+        {
+            throw new ConflictException($"Product with SKU '{product.Sku}' already exists");
+        }
+        
         return savedProduct.ToDomain();
     }
 
-    public async Task<Product> ChangeStatus(int id, Status status)
+    public async Task<Product> ChangeStatus(int id, Status status, CancellationToken cancellationToken)
     {
-        var productToUpdate = await _dbContext.Products.FindAsync(id);
+        var productToUpdate = await _dbContext.Products.FindAsync([id], cancellationToken);
 
         if (productToUpdate == null)
             throw new NotFoundException($"Product with id {id} was not found");
         
+        if (!productToUpdate.CanChangeStatus(status))
+            throw new InvalidStatusTransitionException(productToUpdate.Status, status);
+        
         productToUpdate.ChangeStatus(status);
         
-        await _dbContext.SaveChangesAsync();
+        await _dbContext.SaveChangesAsync(cancellationToken);
         return productToUpdate.ToDomain();
     }
 }

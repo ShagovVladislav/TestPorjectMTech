@@ -5,8 +5,8 @@ namespace TestProjectMTech.api.Services.Interfaces;
 
 public interface IProductService
 {
-    Task<List<Product>> GetProducts(GetProductsFilters filters);
-    Task<Product> GetProductById(int id);
-    Task<Product> CreateProduct(CreateProductRequest request);
-    Task<Product> ChangeStatus(int id, Status status);
+    Task<List<Product>> GetProducts(GetProductsFilters filters, CancellationToken cancellationToken);
+    Task<Product> GetProductById(int id, CancellationToken cancellationToken);
+    Task<Product> CreateProduct(CreateProductRequest request, CancellationToken cancellationToken);
+    Task<Product> ChangeStatus(int id, Status status, CancellationToken cancellationToken);
 }

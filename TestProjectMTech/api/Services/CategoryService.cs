@@ -15,20 +15,20 @@ public class CategoryService : ICategoryService
         _categoryRepository = categoryRepository;
     }
 
-    public async Task<List<Category>> GetAllCategories()
+    public async Task<List<Category>> GetAllCategories(CancellationToken cancellationToken)
     {
-        var categories = await _categoryRepository.GetAllCategories();
+        var categories = await _categoryRepository.GetAllCategories(cancellationToken);
 
         return categories;
     }
 
-    public async Task<Category> CreateCategory(CreateCategoryRequest categoryRequest)
+    public async Task<Category> CreateCategory(CreateCategoryRequest categoryRequest, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(categoryRequest.Name))
             throw new ValidationException("Category name must not be empty");
         
         var category = new Category{ Name = categoryRequest.Name };
-        var result = await _categoryRepository.CreateCategory(category);
+        var result = await _categoryRepository.CreateCategory(category, cancellationToken);
         
         return result;
     }

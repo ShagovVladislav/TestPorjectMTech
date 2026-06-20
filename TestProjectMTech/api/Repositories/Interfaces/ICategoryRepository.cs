@@ -5,6 +5,6 @@ namespace TestProjectMTech.api.Repositories.Interfaces;
 
 public interface ICategoryRepository
 {
-    Task<List<Category>> GetAllCategories();
-    Task<Category> CreateCategory(Category category);
+    Task<List<Category>> GetAllCategories(CancellationToken cancellationToken);
+    Task<Category> CreateCategory(Category category, CancellationToken cancellationToken);
 }
