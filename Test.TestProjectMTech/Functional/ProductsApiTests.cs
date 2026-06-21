@@ -147,7 +147,7 @@ public class ProductsApiTests : FunctionalTestBase
     [Test]
     public async Task ChangeProductStatus_Should_Return_Updated_Product()
     {
-        var response = await Client.PutAsync("/api/products/1/status?status=Defective", null);
+        var response = await Client.PatchAsync("/api/products/1/status?status=Defective", null);
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -160,7 +160,7 @@ public class ProductsApiTests : FunctionalTestBase
     [Test]
     public async Task ChangeProductStatus_Should_Return_NotFound_When_Product_Does_Not_Exist()
     {
-        var response = await Client.PutAsync("/api/products/999/status?status=Defective", null);
+        var response = await Client.PatchAsync("/api/products/999/status?status=Defective", null);
 
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
@@ -168,7 +168,7 @@ public class ProductsApiTests : FunctionalTestBase
     [Test]
     public async Task ChangeProductStatus_Should_Return_Conflict_When_Transition_Is_Not_Allowed()
     {
-        var response = await Client.PutAsync("/api/products/1/status?status=WriteOff", null);
+        var response = await Client.PatchAsync("/api/products/1/status?status=WriteOff", null);
 
         response.StatusCode.Should().Be(HttpStatusCode.Conflict);
     }

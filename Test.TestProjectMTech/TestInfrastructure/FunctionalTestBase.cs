@@ -8,10 +8,9 @@ public abstract class FunctionalTestBase
     protected HttpClient Client { get; private set; } = null!;
 
     [SetUp]
-    public async Task SetUp()
+    public void SetUp()
     {
         _database = new DatabaseFixture();
-        await _database.InitializeAsync();
 
         _factory = new CustomWebApplicationFactory(_database.ConnectionString);
         Client = _factory.CreateClient();

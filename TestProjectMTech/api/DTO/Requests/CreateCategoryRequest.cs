@@ -5,6 +5,7 @@ namespace TestProjectMTech.api.DTO.Requests;
 
 public class CreateCategoryRequest
 {
+    [Required]
     [MaxLength(RequestStringConstants.CategoryNameMaxLength)]
     [MinLength(RequestStringConstants.CategoryNameMinLength)]
     public required string Name { get; set; }
