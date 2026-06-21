@@ -4,7 +4,7 @@ REST API на .NET 10 для учета товаров на складе.
 
 ## Что реализовано
 
-- Категории: получение списка и создание.
+- Категории: получение списка, получение по `id` и создание.
 - Товары: получение списка, фильтрация по `status` и `categoryId`, получение по `id`, создание, смена статуса.
 - Бизнес-правила статусов: `Active -> Defective`, `Defective -> WriteOff`; обратные переходы и `Active -> WriteOff` запрещены.
 - Уникальность `sku`.
@@ -116,6 +116,7 @@ GET /api/products?status=Active&categoryId=1&page=1&pageSize=10
 | Метод | Путь | Описание |
 | --- | --- | --- |
 | `GET` | `/api/categories` | список категорий |
+| `GET` | `/api/categories/{id}` | получить категорию по id |
 | `POST` | `/api/categories` | создать категорию |
 | `GET` | `/api/products` | список товаров, фильтры `status`, `categoryId`, пагинация `page`, `pageSize` |
 | `GET` | `/api/products/{id}` | получить товар по id |

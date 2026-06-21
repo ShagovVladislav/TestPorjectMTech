@@ -26,6 +26,27 @@ public class CategoriesApiTests : FunctionalTestBase
     }
 
     [Test]
+    public async Task GetCategoryById_Should_Return_Category_When_Category_Exists()
+    {
+        var response = await Client.GetAsync("/api/categories/1");
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var category = await response.Content.ReadFromJsonAsync<CategoryResponse>();
+        category.Should().NotBeNull();
+        category!.Id.Should().Be(1);
+        category.Name.Should().Be("Телевизоры");
+    }
+
+    [Test]
+    public async Task GetCategoryById_Should_Return_NotFound_When_Category_Does_Not_Exist()
+    {
+        var response = await Client.GetAsync("/api/categories/999");
+
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+
+    [Test]
     public async Task CreateCategory_Should_Return_Created_Category()
     {
         var request = new CreateCategoryRequest
@@ -41,6 +62,8 @@ public class CategoriesApiTests : FunctionalTestBase
         category.Should().NotBeNull();
         category!.Id.Should().BeGreaterThan(0);
         category.Name.Should().Be("Аэрогрили");
+        response.Headers.Location.Should().NotBeNull();
+        response.Headers.Location!.ToString().Should().EndWith($"/api/categories/{category.Id}");
     }
 
     [Test]
