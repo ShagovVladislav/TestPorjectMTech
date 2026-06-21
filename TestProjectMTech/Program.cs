@@ -31,11 +31,7 @@ builder.Services.AddSingleton<IProductStatusPolicy, ProductStatusPolicy>();
 
 var app = builder.Build();
 
-await using (var scope = app.Services.CreateAsyncScope())
-{
-    var dbContext = scope.ServiceProvider.GetRequiredService<WarehouseDbContext>();
-    await dbContext.Database.MigrateAsync();
-}
+await MigrateDatabaseAsync(app.Services);
 
 if (app.Environment.IsDevelopment())
 {
@@ -52,3 +48,32 @@ app.UseHttpsRedirection();
 app.MapControllers();
 
 await app.RunAsync();
+
+async Task MigrateDatabaseAsync(IServiceProvider services)
+{
+    const int retryCount = 10;
+    var logger = services
+        .GetRequiredService<ILoggerFactory>()
+        .CreateLogger("DatabaseMigration");
+
+    for (var attempt = 1; attempt <= retryCount; attempt++)
+    {
+        try
+        {
+            await using var scope = services.CreateAsyncScope();
+            var dbContext = scope.ServiceProvider.GetRequiredService<WarehouseDbContext>();
+            await dbContext.Database.MigrateAsync();
+            return;
+        }
+        catch (Exception exception) when (attempt < retryCount)
+        {
+            logger.LogWarning(
+                exception,
+                "Database migration failed on attempt {Attempt} of {RetryCount}",
+                attempt,
+                retryCount);
+
+            await Task.Delay(TimeSpan.FromSeconds(2));
+        }
+    }
+}

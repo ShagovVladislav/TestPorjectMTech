@@ -25,6 +25,15 @@ public class CategoryRepository : ICategoryRepository
         return categories;
     }
 
+    public async Task<Category?> GetCategoryById(int id, CancellationToken cancellationToken)
+    {
+        var category = await _dbContext.Categories
+            .AsNoTracking()
+            .FirstOrDefaultAsync(c => c.Id == id, cancellationToken);
+        
+        return category?.ToDomain();
+    }
+
     public async Task<Category> CreateCategory(Category category, CancellationToken cancellationToken)
     {
         var savedCategory = _dbContext.Add(category.ToModel()).Entity;

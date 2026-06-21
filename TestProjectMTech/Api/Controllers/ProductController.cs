@@ -3,17 +3,18 @@ using TestProjectMTech.Api.Domain;
 using TestProjectMTech.Api.DTO.Requests;
 using TestProjectMTech.Api.DTO.Responses;
 using TestProjectMTech.Api.DTO.Responses.Mappers;
+using TestProjectMTech.Api.Exceptions;
 using TestProjectMTech.Api.Services.Interfaces;
 
 namespace TestProjectMTech.Api.Controllers;
 
 [Route("api/products")]
 [ApiController]
-public class ProductControllers : ControllerBase
+public class ProductController : ControllerBase
 {
     private readonly IProductService _productService;
 
-    public ProductControllers(IProductService productService)
+    public ProductController(IProductService productService)
     {
         _productService = productService;
     }
@@ -46,9 +47,12 @@ public class ProductControllers : ControllerBase
     }
     
     [HttpPatch("{id:int}/status")]
-    public async Task<ActionResult<ProductResponse>> ChangeProductStatus([FromRoute] int id, [FromQuery] Status status, CancellationToken cancellationToken)
+    public async Task<ActionResult<ProductResponse>> ChangeProductStatus([FromRoute] int id, [FromQuery] Status? status, CancellationToken cancellationToken)
     {
-        var product = await _productService.ChangeStatus(id, status, cancellationToken);
+        if (status is null)
+            throw new ValidationException("Status must be provided");
+        
+        var product = await _productService.ChangeStatus(id, status.Value, cancellationToken);
         
         return Ok(product.ToResponse()); 
     }

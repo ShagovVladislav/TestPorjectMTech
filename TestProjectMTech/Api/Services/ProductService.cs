@@ -36,7 +36,7 @@ public class ProductService : IProductService
 
     public async Task<Product> CreateProduct(CreateProductRequest request, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrWhiteSpace(request.Name) || string.IsNullOrWhiteSpace(request.SKU))
+        if (string.IsNullOrWhiteSpace(request.Name) || string.IsNullOrWhiteSpace(request.Sku))
             throw new ValidationException("Name and SKU must not be empty");
         
         if (request.CategoryId <= 0)
@@ -45,9 +45,9 @@ public class ProductService : IProductService
         var product = new Product
         {
             Name = request.Name,
-            CategoryId =  request.CategoryId,
+            CategoryId = request.CategoryId,
             Status = Status.Active,
-            Sku = request.SKU
+            Sku = request.Sku
         };
         
         return await _productRepository.CreateProduct(product, cancellationToken);

@@ -3,7 +3,8 @@
     ports:
       - "8082:8080"
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     environment:
       ASPNETCORE_ENVIRONMENT: "Development"
       ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=warehouse_db;Username=postgres;Password=postgres"
@@ -22,6 +23,12 @@
       - "5000:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d warehouse_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
 
 volumes:
   postgres_data:

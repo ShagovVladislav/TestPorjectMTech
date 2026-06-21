@@ -20,7 +20,11 @@ namespace TestProjectMTech.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-
+            migrationBuilder.Sql(
+                """
+                SELECT setval(pg_get_serial_sequence('categories', 'Id'), 1, false);
+                SELECT setval(pg_get_serial_sequence('products', 'Id'), 1, false);
+                """);
         }
     }
 }

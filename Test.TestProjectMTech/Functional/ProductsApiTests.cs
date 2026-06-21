@@ -106,7 +106,7 @@ public class ProductsApiTests : FunctionalTestBase
         var request = new CreateProductRequest
         {
             Name = "Планшет Huawei",
-            SKU = "TABLET-HUAWEI-001",
+            Sku = "TABLET-HUAWEI-001",
             CategoryId = 2
         };
 
@@ -129,7 +129,7 @@ public class ProductsApiTests : FunctionalTestBase
         var request = new CreateProductRequest
         {
             Name = string.Empty,
-            SKU = string.Empty,
+            Sku = string.Empty,
             CategoryId = 0
         };
 
@@ -144,7 +144,7 @@ public class ProductsApiTests : FunctionalTestBase
         var request = new CreateProductRequest
         {
             Name = "Планшет Huawei",
-            SKU = "TABLET-HUAWEI-001",
+            Sku = "TABLET-HUAWEI-001",
             CategoryId = 999
         };
 
@@ -159,7 +159,7 @@ public class ProductsApiTests : FunctionalTestBase
         var request = new CreateProductRequest
         {
             Name = "Другой телевизор",
-            SKU = "TV-SAMSUNG-001",
+            Sku = "TV-SAMSUNG-001",
             CategoryId = 1
         };
 
@@ -187,6 +187,14 @@ public class ProductsApiTests : FunctionalTestBase
         var response = await Client.PatchAsync("/api/products/999/status?status=Defective", null);
 
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+
+    [Test]
+    public async Task ChangeProductStatus_Should_Return_BadRequest_When_Status_Is_Missing()
+    {
+        var response = await Client.PatchAsync("/api/products/1/status", null);
+
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
     [Test]

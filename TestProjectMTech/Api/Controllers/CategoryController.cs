@@ -8,11 +8,11 @@ namespace TestProjectMTech.Api.Controllers;
 
 [Route("api/categories")]
 [ApiController]
-public class CategoryControllers : ControllerBase
+public class CategoryController : ControllerBase
 {
     private readonly ICategoryService _categoryService;
     
-    public CategoryControllers(ICategoryService categoryService)
+    public CategoryController(ICategoryService categoryService)
     {
         _categoryService = categoryService;
     }
@@ -25,6 +25,14 @@ public class CategoryControllers : ControllerBase
         return Ok(categories.ToResponse());
     }
 
+    [HttpGet("{id:int}")]
+    public async Task<ActionResult<CategoryResponse>> GetCategoryById([FromRoute] int id, CancellationToken cancellationToken)
+    {
+        var category = await _categoryService.GetCategoryById(id, cancellationToken);
+
+        return Ok(category.ToResponse());
+    }
+
     [HttpPost]
     public async Task<ActionResult<CategoryResponse>> CreateCategory(
         CreateCategoryRequest category,
@@ -32,6 +40,9 @@ public class CategoryControllers : ControllerBase
     {
         var createdCategory = await _categoryService.CreateCategory(category, cancellationToken);
         
-        return Created("api/categories", createdCategory.ToResponse());
+        return CreatedAtAction(
+            nameof(GetCategoryById),
+            new { id = createdCategory.Id },
+            createdCategory.ToResponse());
     }
 }

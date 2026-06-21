@@ -22,6 +22,13 @@ public class CategoryService : ICategoryService
         return categories;
     }
 
+    public async Task<Category> GetCategoryById(int id, CancellationToken cancellationToken)
+    {
+        var category = await _categoryRepository.GetCategoryById(id, cancellationToken);
+
+        return category ?? throw new NotFoundException($"Category with id {id} was not found");
+    }
+
     public async Task<Category> CreateCategory(CreateCategoryRequest categoryRequest, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(categoryRequest.Name))

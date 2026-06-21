@@ -13,7 +13,7 @@ public class CreateProductRequest
     [Required]
     [MaxLength(RequestStringConstants.SkuNameMaxLength)]
     [MinLength(RequestStringConstants.SkuNameMinLength)]
-    public required string SKU { get; set; }
+    public required string Sku { get; set; }
     
     [Range(1, int.MaxValue)]
     public int CategoryId { get; set; }
