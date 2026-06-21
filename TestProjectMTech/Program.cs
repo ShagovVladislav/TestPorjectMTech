@@ -1,11 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
-using TestProjectMTech.api.Data;
-using TestProjectMTech.api.Middleware;
-using TestProjectMTech.api.Repositories;
-using TestProjectMTech.api.Repositories.Interfaces;
-using TestProjectMTech.api.Services;
-using TestProjectMTech.api.Services.Interfaces;
+using TestProjectMTech.Api.Data;
+using TestProjectMTech.Api.Middleware;
+using TestProjectMTech.Api.Repositories;
+using TestProjectMTech.Api.Repositories.Interfaces;
+using TestProjectMTech.Api.Services;
+using TestProjectMTech.Api.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -51,4 +51,3 @@ app.MapControllers();
 
 await app.RunAsync();
 
-public partial class Program;

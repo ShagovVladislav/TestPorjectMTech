@@ -2,8 +2,8 @@ using System.Net;
 using System.Net.Http.Json;
 using FluentAssertions;
 using Test.TestProjectMTech.TestInfrastructure;
-using TestProjectMTech.api.Domain;
-using TestProjectMTech.api.DTO.Requests;
+using TestProjectMTech.Api.Domain;
+using TestProjectMTech.Api.DTO.Requests;
 
 namespace Test.TestProjectMTech.Functional;
 

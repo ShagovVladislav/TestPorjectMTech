@@ -1,8 +1,8 @@
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Test.TestProjectMTech.TestInfrastructure;
-using TestProjectMTech.api.Domain;
-using TestProjectMTech.api.Repositories;
+using TestProjectMTech.Api.Domain;
+using TestProjectMTech.Api.Repositories;
 
 namespace Test.TestProjectMTech.Integration;
 

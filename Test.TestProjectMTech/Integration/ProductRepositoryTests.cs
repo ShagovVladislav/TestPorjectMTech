@@ -1,10 +1,10 @@
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Test.TestProjectMTech.TestInfrastructure;
-using TestProjectMTech.api.Domain;
-using TestProjectMTech.api.DTO.Requests;
-using TestProjectMTech.api.Exceptions;
-using TestProjectMTech.api.Repositories;
+using TestProjectMTech.Api.Domain;
+using TestProjectMTech.Api.DTO.Requests;
+using TestProjectMTech.Api.Exceptions;
+using TestProjectMTech.Api.Repositories;
 
 namespace Test.TestProjectMTech.Integration;
 
@@ -36,7 +36,7 @@ public class ProductRepositoryTests : RepositoryTestBase
         var result = await repository.GetProducts(
             new GetProductsFilters
             {
-                categoryId = 1
+                CategoryId = 1
             },
             CancellationToken.None);
 
@@ -53,7 +53,7 @@ public class ProductRepositoryTests : RepositoryTestBase
         var result = await repository.GetProducts(
             new GetProductsFilters
             {
-                status = Status.Active
+                Status = Status.Active
             },
             CancellationToken.None);
 
@@ -70,8 +70,8 @@ public class ProductRepositoryTests : RepositoryTestBase
         var result = await repository.GetProducts(
             new GetProductsFilters
             {
-                page = 2,
-                pageSize = 2
+                Page = 2,
+                PageSize = 2
             },
             CancellationToken.None);
 
@@ -90,9 +90,9 @@ public class ProductRepositoryTests : RepositoryTestBase
         var result = await repository.GetProducts(
             new GetProductsFilters
             {
-                categoryId = 1,
-                page = 2,
-                pageSize = 1
+                CategoryId = 1,
+                Page = 2,
+                PageSize = 1
             },
             CancellationToken.None);
 

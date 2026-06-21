@@ -1,4 +1,4 @@
-using TestProjectMTech.api.Data;
+using TestProjectMTech.Api.Data;
 
 namespace Test.TestProjectMTech.TestInfrastructure;
 
