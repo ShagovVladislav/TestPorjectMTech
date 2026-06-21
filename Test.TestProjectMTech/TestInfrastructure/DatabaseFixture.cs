@@ -34,6 +34,11 @@ public sealed class DatabaseFixture : IAsyncDisposable
         return new WarehouseDbContext(options);
     }
 
+    public IDbContextFactory<WarehouseDbContext> CreateContextFactory()
+    {
+        return new TestWarehouseDbContextFactory(ConnectionString);
+    }
+
     public async Task InitializeAsync(CancellationToken cancellationToken = default)
     {
         await using var context = CreateContext();
@@ -60,5 +65,24 @@ public sealed class DatabaseFixture : IAsyncDisposable
             SELECT setval(pg_get_serial_sequence('products', 'Id'), COALESCE((SELECT MAX("Id") FROM products), 1));
             """,
             cancellationToken);
+    }
+
+    private sealed class TestWarehouseDbContextFactory : IDbContextFactory<WarehouseDbContext>
+    {
+        private readonly string _connectionString;
+
+        public TestWarehouseDbContextFactory(string connectionString)
+        {
+            _connectionString = connectionString;
+        }
+
+        public WarehouseDbContext CreateDbContext()
+        {
+            var options = new DbContextOptionsBuilder<WarehouseDbContext>()
+                .UseNpgsql(_connectionString)
+                .Options;
+
+            return new WarehouseDbContext(options);
+        }
     }
 }

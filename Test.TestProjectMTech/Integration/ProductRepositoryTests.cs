@@ -4,7 +4,6 @@ using Test.TestProjectMTech.TestInfrastructure;
 using TestProjectMTech.Api.Domain;
 using TestProjectMTech.Api.DTO.Requests;
 using TestProjectMTech.Api.Exceptions;
-using TestProjectMTech.Api.Repositories;
 
 namespace Test.TestProjectMTech.Integration;
 
@@ -13,8 +12,7 @@ public class ProductRepositoryTests : RepositoryTestBase
     [Test]
     public async Task GetProducts_Should_Return_All_Products()
     {
-        await using var context = CreateContext();
-        var repository = new ProductRepository(context);
+        var repository = CreateProductRepository();
 
         var result = await repository.GetProducts(new GetProductsFilters(), CancellationToken.None);
 
@@ -30,8 +28,7 @@ public class ProductRepositoryTests : RepositoryTestBase
     [Test]
     public async Task GetProducts_Should_Filter_By_Category()
     {
-        await using var context = CreateContext();
-        var repository = new ProductRepository(context);
+        var repository = CreateProductRepository();
 
         var result = await repository.GetProducts(
             new GetProductsFilters
@@ -47,8 +44,7 @@ public class ProductRepositoryTests : RepositoryTestBase
     [Test]
     public async Task GetProducts_Should_Filter_By_Status()
     {
-        await using var context = CreateContext();
-        var repository = new ProductRepository(context);
+        var repository = CreateProductRepository();
 
         var result = await repository.GetProducts(
             new GetProductsFilters
@@ -64,8 +60,7 @@ public class ProductRepositoryTests : RepositoryTestBase
     [Test]
     public async Task GetProducts_Should_Return_Requested_Page()
     {
-        await using var context = CreateContext();
-        var repository = new ProductRepository(context);
+        var repository = CreateProductRepository();
 
         var result = await repository.GetProducts(
             new GetProductsFilters
@@ -84,8 +79,7 @@ public class ProductRepositoryTests : RepositoryTestBase
     [Test]
     public async Task GetProducts_Should_Filter_And_Paginate()
     {
-        await using var context = CreateContext();
-        var repository = new ProductRepository(context);
+        var repository = CreateProductRepository();
 
         var result = await repository.GetProducts(
             new GetProductsFilters
@@ -103,13 +97,12 @@ public class ProductRepositoryTests : RepositoryTestBase
     [Test]
     public async Task GetProductById_Should_Return_Product_When_Product_Exists()
     {
-        await using var context = CreateContext();
-        var repository = new ProductRepository(context);
+        var repository = CreateProductRepository();
 
         var result = await repository.GetProductById(1, CancellationToken.None);
 
         result.Should().NotBeNull();
-        result!.Name.Should().Be("Телевизор Samsung");
+        result.Name.Should().Be("Телевизор Samsung");
         result.Sku.Should().Be("TV-SAMSUNG-001");
         result.CategoryId.Should().Be(1);
         result.Status.Should().Be(Status.Active);
@@ -118,8 +111,7 @@ public class ProductRepositoryTests : RepositoryTestBase
     [Test]
     public async Task GetProductById_Should_Return_Null_When_Product_Does_Not_Exist()
     {
-        await using var context = CreateContext();
-        var repository = new ProductRepository(context);
+        var repository = CreateProductRepository();
 
         var result = await repository.GetProductById(999, CancellationToken.None);
 
@@ -129,8 +121,7 @@ public class ProductRepositoryTests : RepositoryTestBase
     [Test]
     public async Task CreateProduct_Should_Save_Product()
     {
-        await using var context = CreateContext();
-        var repository = new ProductRepository(context);
+        var repository = CreateProductRepository();
 
         var result = await repository.CreateProduct(
             new Product
@@ -162,8 +153,7 @@ public class ProductRepositoryTests : RepositoryTestBase
     [Test]
     public async Task CreateProduct_Should_Throw_NotFoundException_When_Category_Does_Not_Exist()
     {
-        await using var context = CreateContext();
-        var repository = new ProductRepository(context);
+        var repository = CreateProductRepository();
 
         Func<Task> act = () => repository.CreateProduct(
             new Product
@@ -182,8 +172,7 @@ public class ProductRepositoryTests : RepositoryTestBase
     [Test]
     public async Task CreateProduct_Should_Throw_ConflictException_When_Sku_Already_Exists()
     {
-        await using var context = CreateContext();
-        var repository = new ProductRepository(context);
+        var repository = CreateProductRepository();
 
         Func<Task> act = () => repository.CreateProduct(
             new Product
@@ -202,8 +191,7 @@ public class ProductRepositoryTests : RepositoryTestBase
     [Test]
     public async Task ChangeStatus_Should_Update_Product_Status()
     {
-        await using var context = CreateContext();
-        var repository = new ProductRepository(context);
+        var repository = CreateProductRepository();
 
         var result = await repository.ChangeStatus(1, Status.Defective, CancellationToken.None);
 
@@ -221,8 +209,7 @@ public class ProductRepositoryTests : RepositoryTestBase
     [Test]
     public async Task ChangeStatus_Should_Not_Change_Product_When_Status_Is_The_Same()
     {
-        await using var context = CreateContext();
-        var repository = new ProductRepository(context);
+        var repository = CreateProductRepository();
 
         var result = await repository.ChangeStatus(1, Status.Active, CancellationToken.None);
 
@@ -233,8 +220,7 @@ public class ProductRepositoryTests : RepositoryTestBase
     [Test]
     public async Task ChangeStatus_Should_Throw_NotFoundException_When_Product_Does_Not_Exist()
     {
-        await using var context = CreateContext();
-        var repository = new ProductRepository(context);
+        var repository = CreateProductRepository();
 
         Func<Task> act = () => repository.ChangeStatus(999, Status.Defective, CancellationToken.None);
 

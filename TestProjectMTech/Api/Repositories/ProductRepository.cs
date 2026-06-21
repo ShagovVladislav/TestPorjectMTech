@@ -11,16 +11,18 @@ namespace TestProjectMTech.Api.Repositories;
 
 public class ProductRepository : IProductRepository
 {
-    private readonly WarehouseDbContext _dbContext;
+    private readonly IDbContextFactory<WarehouseDbContext> _dbContextFactory;
 
-    public ProductRepository(WarehouseDbContext dbContext)
+    public ProductRepository(IDbContextFactory<WarehouseDbContext> dbContextFactory)
     {
-        _dbContext = dbContext;
+        _dbContextFactory = dbContextFactory;
     }
 
     public async Task<List<Product>> GetProducts(GetProductsFilters filters, CancellationToken cancellationToken)
     {
-        var products = _dbContext.Products
+        await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+
+        var products = dbContext.Products
             .AsNoTracking();
         
         if (filters.CategoryId.HasValue)
@@ -43,7 +45,9 @@ public class ProductRepository : IProductRepository
 
     public async Task<Product?> GetProductById(int id, CancellationToken cancellationToken)
     {
-        var product = await _dbContext.Products
+        await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+
+        var product = await dbContext.Products
             .AsNoTracking()
             .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
         
@@ -52,23 +56,25 @@ public class ProductRepository : IProductRepository
 
     public async Task<Product> CreateProduct(Product product, CancellationToken cancellationToken)
     {
-        var categoryExists = await _dbContext.Categories.AnyAsync(c => c.Id == product.CategoryId, cancellationToken);
+        await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+
+        var categoryExists = await dbContext.Categories.AnyAsync(c => c.Id == product.CategoryId, cancellationToken);
         
         if (!categoryExists)
             throw new NotFoundException($"Category with id {product.CategoryId} was not found");
         
-        var skuExists = await _dbContext.Products.AnyAsync(
+        var skuExists = await dbContext.Products.AnyAsync(
             p => p.Sku == product.Sku,
             cancellationToken);
         
         if (skuExists)
             throw new ConflictException($"Product with SKU '{product.Sku}' already exists");
         
-        var savedProduct = _dbContext.Add(product.ToModel()).Entity;
+        var savedProduct = dbContext.Add(product.ToModel()).Entity;
         
         try
         {
-            await _dbContext.SaveChangesAsync(cancellationToken);
+            await dbContext.SaveChangesAsync(cancellationToken);
         }
         catch (DbUpdateException exception)
             when (exception.InnerException is PostgresException { SqlState: PostgresErrorCodes.UniqueViolation })
@@ -81,14 +87,16 @@ public class ProductRepository : IProductRepository
 
     public async Task<Product> ChangeStatus(int id, Status status, CancellationToken cancellationToken)
     {
-        var productToUpdate = await _dbContext.Products.FindAsync([id], cancellationToken);
+        await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+
+        var productToUpdate = await dbContext.Products.FindAsync([id], cancellationToken);
 
         if (productToUpdate == null)
             throw new NotFoundException($"Product with id {id} was not found");
 
         productToUpdate.Status = status;
         
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        await dbContext.SaveChangesAsync(cancellationToken);
         return productToUpdate.ToDomain();
     }
 }

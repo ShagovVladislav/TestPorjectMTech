@@ -2,7 +2,6 @@ using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Test.TestProjectMTech.TestInfrastructure;
 using TestProjectMTech.Api.Domain;
-using TestProjectMTech.Api.Repositories;
 
 namespace Test.TestProjectMTech.Integration;
 
@@ -11,8 +10,7 @@ public class CategoryRepositoryTests : RepositoryTestBase
     [Test]
     public async Task GetAllCategories_Should_Return_All_Categories()
     {
-        await using var context = CreateContext();
-        var repository = new CategoryRepository(context);
+        var repository = CreateCategoryRepository();
 
         var result = await repository.GetAllCategories(CancellationToken.None);
 
@@ -26,8 +24,7 @@ public class CategoryRepositoryTests : RepositoryTestBase
     [Test]
     public async Task GetCategoryById_Should_Return_Category_When_Category_Exists()
     {
-        await using var context = CreateContext();
-        var repository = new CategoryRepository(context);
+        var repository = CreateCategoryRepository();
 
         var result = await repository.GetCategoryById(1, CancellationToken.None);
 
@@ -39,8 +36,7 @@ public class CategoryRepositoryTests : RepositoryTestBase
     [Test]
     public async Task GetCategoryById_Should_Return_Null_When_Category_Does_Not_Exist()
     {
-        await using var context = CreateContext();
-        var repository = new CategoryRepository(context);
+        var repository = CreateCategoryRepository();
 
         var result = await repository.GetCategoryById(999, CancellationToken.None);
 
@@ -50,8 +46,7 @@ public class CategoryRepositoryTests : RepositoryTestBase
     [Test]
     public async Task CreateCategory_Should_Save_Category()
     {
-        await using var context = CreateContext();
-        var repository = new CategoryRepository(context);
+        var repository = CreateCategoryRepository();
 
         var result = await repository.CreateCategory(
             new Category

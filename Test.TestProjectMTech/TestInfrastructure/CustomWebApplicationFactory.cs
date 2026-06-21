@@ -22,9 +22,10 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
         
         builder.ConfigureServices(services =>
         {
+            services.RemoveAll<IDbContextFactory<WarehouseDbContext>>();
             services.RemoveAll<DbContextOptions<WarehouseDbContext>>();
             
-            services.AddDbContext<WarehouseDbContext>(options =>
+            services.AddDbContextFactory<WarehouseDbContext>(options =>
                 options.UseNpgsql(_connectionString));
         });
     }

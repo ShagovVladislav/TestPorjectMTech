@@ -8,16 +8,18 @@ namespace TestProjectMTech.Api.Repositories;
 
 public class CategoryRepository : ICategoryRepository
 {
-    private readonly WarehouseDbContext _dbContext;
+    private readonly IDbContextFactory<WarehouseDbContext> _dbContextFactory;
 
-    public CategoryRepository(WarehouseDbContext dbContext)
+    public CategoryRepository(IDbContextFactory<WarehouseDbContext> dbContextFactory)
     {
-        _dbContext = dbContext;
+        _dbContextFactory = dbContextFactory;
     }
 
     public async Task<List<Category>> GetAllCategories(CancellationToken cancellationToken)
     {
-        var categories = await _dbContext.Categories
+        await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+
+        var categories = await dbContext.Categories
             .AsNoTracking()
             .Select(c => c.ToDomain())
             .ToListAsync(cancellationToken);
@@ -27,7 +29,9 @@ public class CategoryRepository : ICategoryRepository
 
     public async Task<Category?> GetCategoryById(int id, CancellationToken cancellationToken)
     {
-        var category = await _dbContext.Categories
+        await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+
+        var category = await dbContext.Categories
             .AsNoTracking()
             .FirstOrDefaultAsync(c => c.Id == id, cancellationToken);
         
@@ -36,9 +40,11 @@ public class CategoryRepository : ICategoryRepository
 
     public async Task<Category> CreateCategory(Category category, CancellationToken cancellationToken)
     {
-        var savedCategory = _dbContext.Add(category.ToModel()).Entity;
+        await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+
+        var savedCategory = dbContext.Add(category.ToModel()).Entity;
         
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        await dbContext.SaveChangesAsync(cancellationToken);
         
         return savedCategory.ToDomain();
     }

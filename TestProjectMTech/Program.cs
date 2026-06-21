@@ -20,7 +20,7 @@ builder.Services.AddSwaggerGen(options =>
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
                        ?? throw new InvalidOperationException("DefaultConnection is not configured");
 
-builder.Services.AddDbContext<WarehouseDbContext>(options =>
+builder.Services.AddDbContextFactory<WarehouseDbContext>(options =>
     options.UseNpgsql(connectionString));
 
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
@@ -60,8 +60,8 @@ async Task MigrateDatabaseAsync(IServiceProvider services)
     {
         try
         {
-            await using var scope = services.CreateAsyncScope();
-            var dbContext = scope.ServiceProvider.GetRequiredService<WarehouseDbContext>();
+            var dbContextFactory = services.GetRequiredService<IDbContextFactory<WarehouseDbContext>>();
+            await using var dbContext = dbContextFactory.CreateDbContext();
             await dbContext.Database.MigrateAsync();
             return;
         }
