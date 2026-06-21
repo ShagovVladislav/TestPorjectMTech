@@ -241,16 +241,4 @@ public class ProductRepositoryTests : RepositoryTestBase
         await act.Should().ThrowAsync<NotFoundException>()
             .WithMessage("Product with id 999 was not found");
     }
-
-    [Test]
-    public async Task ChangeStatus_Should_Throw_InvalidStatusTransitionException_When_Transition_Is_Not_Allowed()
-    {
-        await using var context = CreateContext();
-        var repository = new ProductRepository(context);
-
-        Func<Task> act = () => repository.ChangeStatus(1, Status.WriteOff, CancellationToken.None);
-
-        await act.Should().ThrowAsync<InvalidStatusTransitionException>()
-            .WithMessage("Cannot change product status from Active to WriteOff");
-    }
 }

@@ -85,11 +85,8 @@ public class ProductRepository : IProductRepository
 
         if (productToUpdate == null)
             throw new NotFoundException($"Product with id {id} was not found");
-        
-        if (!productToUpdate.CanChangeStatus(status))
-            throw new InvalidStatusTransitionException(productToUpdate.Status, status);
-        
-        productToUpdate.ChangeStatus(status);
+
+        productToUpdate.Status = status;
         
         await _dbContext.SaveChangesAsync(cancellationToken);
         return productToUpdate.ToDomain();

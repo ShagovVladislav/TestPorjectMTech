@@ -10,22 +10,4 @@ public class ProductModel
     public int CategoryId { get; set; }
     public CategoryModel Category { get; set; } = null!;
     public Status Status { get; set; } = Status.Active;
-
-    public bool CanChangeStatus(Status newStatus)
-    {
-        if (Status == newStatus)
-            return true;
-
-        return (Status, newStatus) switch
-        {
-            (Status.Active, Status.Defective) => true,
-            (Status.Defective, Status.WriteOff) => true,
-            _ => false
-        };
-    }
-
-    public void ChangeStatus(Status newStatus)
-    {
-        Status = newStatus;
-    }
 }

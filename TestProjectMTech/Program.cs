@@ -6,6 +6,7 @@ using TestProjectMTech.Api.Repositories;
 using TestProjectMTech.Api.Repositories.Interfaces;
 using TestProjectMTech.Api.Services;
 using TestProjectMTech.Api.Services.Interfaces;
+using TestProjectMTech.Api.Services.Policies;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +27,7 @@ builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddSingleton<IProductStatusPolicy, ProductStatusPolicy>();
 
 var app = builder.Build();
 
@@ -50,4 +52,3 @@ app.UseHttpsRedirection();
 app.MapControllers();
 
 await app.RunAsync();
-
