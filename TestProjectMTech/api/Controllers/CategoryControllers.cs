@@ -29,6 +29,6 @@ public class CategoryControllers : ControllerBase
     {
         var categoryResponse = await _categoryService.CreateCategory(category, cancellationToken);
         
-        return Ok(categoryResponse);
+        return StatusCode(StatusCodes.Status201Created, categoryResponse);
     }
 }

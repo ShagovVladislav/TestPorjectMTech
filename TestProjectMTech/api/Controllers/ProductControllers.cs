@@ -37,7 +37,10 @@ public class ProductControllers : ControllerBase
     {
         var product = await _productService.CreateProduct(productRequest, cancellationToken);
         
-        return Ok(product);
+        return CreatedAtAction(
+            nameof(GetProductById),
+            new { id = product.Id },
+            product);
     }
     
     [HttpPatch("{id:int}/status")]
