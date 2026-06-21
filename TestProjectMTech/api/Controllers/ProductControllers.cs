@@ -41,7 +41,7 @@ public class ProductControllers : ControllerBase
     }
     
     [HttpPatch("{id:int}/status")]
-    public async Task<ActionResult<Product>> ChangeProductStatus([FromRoute] int id, Status status, CancellationToken cancellationToken)
+    public async Task<ActionResult<Product>> ChangeProductStatus([FromRoute] int id, [FromQuery] Status status, CancellationToken cancellationToken)
     {
         var product = await _productService.ChangeStatus(id, status, cancellationToken);
         

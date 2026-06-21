@@ -62,6 +62,45 @@ public class ProductRepositoryTests : RepositoryTestBase
     }
 
     [Test]
+    public async Task GetProducts_Should_Return_Requested_Page()
+    {
+        await using var context = CreateContext();
+        var repository = new ProductRepository(context);
+
+        var result = await repository.GetProducts(
+            new GetProductsFilters
+            {
+                page = 2,
+                pageSize = 2
+            },
+            CancellationToken.None);
+
+        result.Should().HaveCount(2);
+        result.Select(product => product.Sku).Should().ContainInOrder(
+            "PHONE-XIAOMI-001",
+            "PHONE-SAMSUNG-001");
+    }
+
+    [Test]
+    public async Task GetProducts_Should_Filter_And_Paginate()
+    {
+        await using var context = CreateContext();
+        var repository = new ProductRepository(context);
+
+        var result = await repository.GetProducts(
+            new GetProductsFilters
+            {
+                categoryId = 1,
+                page = 2,
+                pageSize = 1
+            },
+            CancellationToken.None);
+
+        result.Should().ContainSingle();
+        result[0].Sku.Should().Be("TV-LG-001");
+    }
+
+    [Test]
     public async Task GetProductById_Should_Return_Product_When_Product_Exists()
     {
         await using var context = CreateContext();

@@ -29,6 +29,13 @@ public class ProductRepository : IProductRepository
         if (filters.status.HasValue)
             products = products.Where(p => p.Status == filters.status);
 
+        var skip = (filters.page - 1) * filters.pageSize;
+        
+        products = products
+            .OrderBy(p => p.Id)
+            .Skip(skip)
+            .Take(filters.pageSize);
+
         var result = (await products.ToListAsync(cancellationToken)).Select(p => p.ToDomain()).ToList();
         
         return result;

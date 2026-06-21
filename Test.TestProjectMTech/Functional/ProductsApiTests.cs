@@ -54,6 +54,29 @@ public class ProductsApiTests : FunctionalTestBase
     }
 
     [Test]
+    public async Task GetProducts_Should_Return_Requested_Page()
+    {
+        var response = await Client.GetAsync("/api/products?page=2&pageSize=2");
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var products = await response.Content.ReadFromJsonAsync<List<Product>>();
+        products.Should().NotBeNull();
+        products.Should().HaveCount(2);
+        products!.Select(product => product.Sku).Should().ContainInOrder(
+            "PHONE-XIAOMI-001",
+            "PHONE-SAMSUNG-001");
+    }
+
+    [Test]
+    public async Task GetProducts_Should_Return_BadRequest_When_Pagination_Is_Invalid()
+    {
+        var response = await Client.GetAsync("/api/products?page=0&pageSize=2");
+
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+    }
+
+    [Test]
     public async Task GetProductById_Should_Return_Product_When_Product_Exists()
     {
         var response = await Client.GetAsync("/api/products/1");
