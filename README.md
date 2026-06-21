@@ -20,7 +20,7 @@ REST API на .NET 10 для учета товаров на складе.
 | --- | --- | --- |
 | `ConnectionStrings__DefaultConnection` | строка подключения API к PostgreSQL | `Host=localhost;Port=5000;Database=warehouse_db;Username=postgres;Password=postgres` |
 | `ASPNETCORE_ENVIRONMENT` | окружение ASP.NET Core | `Development` для локального запуска и compose |
-| `TEST_DB_CONNECTION_STRING` | базовая строка подключения для интеграционных и функциональных тестов | `Host=localhost;Port=5000;Database=warehouse_db;Username=postgres;Password=postgres` |
+| `TEST_DB_CONNECTION_STRING` | fallback-строка подключения для ручного запуска тестовой инфраструктуры без Testcontainers | `Host=localhost;Port=5000;Database=warehouse_db;Username=postgres;Password=postgres` |
 
 ## Локальный запуск
 
@@ -84,18 +84,22 @@ dotnet ef migrations has-pending-model-changes --project TestProjectMTech\TestPr
 
 ## Тесты
 
-Тестам нужен доступный PostgreSQL. По умолчанию используется `localhost:5000`.
+Интеграционные и функциональные тесты сами поднимают PostgreSQL-контейнер через Testcontainers. Для запуска тестов нужен запущенный Docker.
 
 ```powershell
-docker compose up -d postgres
 dotnet test
 ```
 
-Если PostgreSQL запущен на другом адресе, передайте строку подключения:
+Запустить только функциональные тесты:
 
 ```powershell
-$env:TEST_DB_CONNECTION_STRING="Host=localhost;Port=5000;Database=warehouse_db;Username=postgres;Password=postgres"
-dotnet test
+dotnet test --filter "FullyQualifiedName~Functional"
+```
+
+Запустить только интеграционные тесты:
+
+```powershell
+dotnet test --filter "FullyQualifiedName~Integration"
 ```
 
 ## API

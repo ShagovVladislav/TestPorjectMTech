@@ -8,9 +8,10 @@ public abstract class FunctionalTestBase
     protected HttpClient Client { get; private set; } = null!;
 
     [SetUp]
-    public void SetUp()
+    public async Task SetUp()
     {
-        _database = new DatabaseFixture();
+        var connectionString = await TestPostgresContainer.GetConnectionStringAsync();
+        _database = new DatabaseFixture(connectionString);
 
         _factory = new CustomWebApplicationFactory(_database.ConnectionString);
         Client = _factory.CreateClient();
@@ -19,8 +20,12 @@ public abstract class FunctionalTestBase
     [TearDown]
     public async Task TearDown()
     {
-        Client.Dispose();
-        await _factory.DisposeAsync();
-        await _database.DisposeAsync();
+        Client?.Dispose();
+        
+        if (_factory is not null)
+            await _factory.DisposeAsync();
+        
+        if (_database is not null)
+            await _database.DisposeAsync();
     }
 }

@@ -9,7 +9,9 @@ public abstract class RepositoryTestBase
     [SetUp]
     public async Task SetUp()
     {
-        _database = new DatabaseFixture();
+        var connectionString = await TestPostgresContainer.GetConnectionStringAsync();
+        _database = new DatabaseFixture(connectionString);
+        
         await _database.InitializeAsync();
     }
 

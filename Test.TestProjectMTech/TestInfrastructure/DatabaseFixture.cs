@@ -9,12 +9,13 @@ public sealed class DatabaseFixture : IAsyncDisposable
     private const string DefaultConnectionString =
         "Host=localhost;Port=5000;Database=warehouse_db;Username=postgres;Password=postgres";
 
-    public DatabaseFixture()
+    public DatabaseFixture(string? baseConnectionString = null)
     {
-        var baseConnectionString = Environment.GetEnvironmentVariable("TEST_DB_CONNECTION_STRING")
+        var connectionString = baseConnectionString
+            ?? Environment.GetEnvironmentVariable("TEST_DB_CONNECTION_STRING")
             ?? DefaultConnectionString;
 
-        var builder = new NpgsqlConnectionStringBuilder(baseConnectionString)
+        var builder = new NpgsqlConnectionStringBuilder(connectionString)
         {
             Database = $"warehouse_tests_{Guid.NewGuid():N}"
         };
