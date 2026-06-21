@@ -4,6 +4,7 @@ using FluentAssertions;
 using Test.TestProjectMTech.TestInfrastructure;
 using TestProjectMTech.Api.Domain;
 using TestProjectMTech.Api.DTO.Requests;
+using TestProjectMTech.Api.DTO.Responses;
 
 namespace Test.TestProjectMTech.Functional;
 
@@ -16,7 +17,7 @@ public class ProductsApiTests : FunctionalTestBase
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var products = await response.Content.ReadFromJsonAsync<List<Product>>();
+        var products = await response.Content.ReadFromJsonAsync<List<ProductResponse>>();
         products.Should().NotBeNull();
         products.Should().HaveCount(5);
         products!.Select(product => product.Sku).Should().BeEquivalentTo(
@@ -34,7 +35,7 @@ public class ProductsApiTests : FunctionalTestBase
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var products = await response.Content.ReadFromJsonAsync<List<Product>>();
+        var products = await response.Content.ReadFromJsonAsync<List<ProductResponse>>();
         products.Should().NotBeNull();
         products.Should().HaveCount(2);
         products.Should().OnlyContain(product => product.CategoryId == 1);
@@ -47,7 +48,7 @@ public class ProductsApiTests : FunctionalTestBase
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var products = await response.Content.ReadFromJsonAsync<List<Product>>();
+        var products = await response.Content.ReadFromJsonAsync<List<ProductResponse>>();
         products.Should().NotBeNull();
         products.Should().HaveCount(2);
         products.Should().OnlyContain(product => product.Status == Status.Active);
@@ -60,7 +61,7 @@ public class ProductsApiTests : FunctionalTestBase
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var products = await response.Content.ReadFromJsonAsync<List<Product>>();
+        var products = await response.Content.ReadFromJsonAsync<List<ProductResponse>>();
         products.Should().NotBeNull();
         products.Should().HaveCount(2);
         products!.Select(product => product.Sku).Should().ContainInOrder(
@@ -83,7 +84,7 @@ public class ProductsApiTests : FunctionalTestBase
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var product = await response.Content.ReadFromJsonAsync<Product>();
+        var product = await response.Content.ReadFromJsonAsync<ProductResponse>();
         product.Should().NotBeNull();
         product!.Id.Should().Be(1);
         product.Name.Should().Be("Телевизор Samsung");
@@ -111,9 +112,9 @@ public class ProductsApiTests : FunctionalTestBase
 
         var response = await Client.PostAsJsonAsync("/api/products", request);
 
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
 
-        var product = await response.Content.ReadFromJsonAsync<Product>();
+        var product = await response.Content.ReadFromJsonAsync<ProductResponse>();
         product.Should().NotBeNull();
         product!.Id.Should().BeGreaterThan(0);
         product.Name.Should().Be("Планшет Huawei");
@@ -127,9 +128,9 @@ public class ProductsApiTests : FunctionalTestBase
     {
         var request = new CreateProductRequest
         {
-            Name = "AB",
-            SKU = "SHORT",
-            CategoryId = 1
+            Name = string.Empty,
+            SKU = string.Empty,
+            CategoryId = 0
         };
 
         var response = await Client.PostAsJsonAsync("/api/products", request);
@@ -174,7 +175,7 @@ public class ProductsApiTests : FunctionalTestBase
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var product = await response.Content.ReadFromJsonAsync<Product>();
+        var product = await response.Content.ReadFromJsonAsync<ProductResponse>();
         product.Should().NotBeNull();
         product!.Id.Should().Be(1);
         product.Status.Should().Be(Status.Defective);

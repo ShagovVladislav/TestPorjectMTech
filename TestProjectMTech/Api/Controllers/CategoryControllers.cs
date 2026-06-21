@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using TestProjectMTech.Api.Domain;
+using Microsoft.AspNetCore.Mvc;
 using TestProjectMTech.Api.DTO.Requests;
+using TestProjectMTech.Api.DTO.Responses;
+using TestProjectMTech.Api.DTO.Responses.Mappers;
 using TestProjectMTech.Api.Services.Interfaces;
 
 namespace TestProjectMTech.Api.Controllers;
@@ -17,18 +18,20 @@ public class CategoryControllers : ControllerBase
     }
     
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Category>>> GetCategories(CancellationToken cancellationToken)
+    public async Task<ActionResult<List<CategoryResponse>>> GetCategories(CancellationToken cancellationToken)
     {
         var categories = await _categoryService.GetAllCategories(cancellationToken);
         
-        return Ok(categories);
+        return Ok(categories.ToResponse());
     }
 
     [HttpPost]
-    public async Task<ActionResult<Category>> CreateCategory(CreateCategoryRequest category, CancellationToken cancellationToken)
+    public async Task<ActionResult<CategoryResponse>> CreateCategory(
+        CreateCategoryRequest category,
+        CancellationToken cancellationToken)
     {
-        var categoryResponse = await _categoryService.CreateCategory(category, cancellationToken);
+        var createdCategory = await _categoryService.CreateCategory(category, cancellationToken);
         
-        return Created("api/categories", categoryResponse);
+        return Created("api/categories", createdCategory.ToResponse());
     }
 }
