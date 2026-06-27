@@ -4,6 +4,7 @@ using TestProjectMTech.Api.Data;
 using TestProjectMTech.Api.Data.Models.Mappers;
 using TestProjectMTech.Api.Domain;
 using TestProjectMTech.Api.DTO.Requests;
+using TestProjectMTech.Api.DTO.Responses;
 using TestProjectMTech.Api.Exceptions;
 using TestProjectMTech.Api.Repositories.Interfaces;
 
@@ -18,7 +19,7 @@ public class ProductRepository : IProductRepository
         _dbContextFactory = dbContextFactory;
     }
 
-    public async Task<List<Product>> GetProducts(GetProductsFilters filters, CancellationToken cancellationToken)
+    public async Task<PagedResult<Product>> GetProducts(GetProductsFilters filters, CancellationToken cancellationToken)
     {
         await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
 
@@ -31,6 +32,8 @@ public class ProductRepository : IProductRepository
         if (filters.Status.HasValue)
             products = products.Where(p => p.Status == filters.Status);
 
+        var totalCount = await products.CountAsync(cancellationToken);
+        
         var skip = (filters.Page - 1) * filters.PageSize;
         
         products = products
@@ -40,7 +43,13 @@ public class ProductRepository : IProductRepository
 
         var result = (await products.ToListAsync(cancellationToken)).Select(p => p.ToDomain()).ToList();
         
-        return result;
+        return new PagedResult<Product>
+        {
+            Items = result,
+            TotalCount = totalCount,
+            Page = filters.Page,
+            PageSize = filters.PageSize
+        };
     }
 
     public async Task<Product?> GetProductById(int id, CancellationToken cancellationToken)
@@ -57,18 +66,6 @@ public class ProductRepository : IProductRepository
     public async Task<Product> CreateProduct(Product product, CancellationToken cancellationToken)
     {
         await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
-
-        var categoryExists = await dbContext.Categories.AnyAsync(c => c.Id == product.CategoryId, cancellationToken);
-        
-        if (!categoryExists)
-            throw new NotFoundException($"Category with id {product.CategoryId} was not found");
-        
-        var skuExists = await dbContext.Products.AnyAsync(
-            p => p.Sku == product.Sku,
-            cancellationToken);
-        
-        if (skuExists)
-            throw new ConflictException($"Product with SKU '{product.Sku}' already exists");
         
         var savedProduct = dbContext.Add(product.ToModel()).Entity;
         
@@ -98,5 +95,15 @@ public class ProductRepository : IProductRepository
         
         await dbContext.SaveChangesAsync(cancellationToken);
         return productToUpdate.ToDomain();
+    }
+
+    public async Task<bool> ExistsBySku(string sku, CancellationToken cancellationToken)
+    {
+        await using var dbContext =
+            await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+
+        return await dbContext.Products
+            .AsNoTracking()
+            .AnyAsync(product => product.Sku == sku, cancellationToken);
     }
 }

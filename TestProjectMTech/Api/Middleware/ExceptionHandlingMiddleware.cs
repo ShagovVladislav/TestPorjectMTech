@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebUtilities;
 using TestProjectMTech.Api.Exceptions;
 
 namespace TestProjectMTech.Api.Middleware;
@@ -16,7 +17,7 @@ public class ExceptionHandlingMiddleware
         _logger = logger;
     }
 
-    public async Task InvokeAsync(HttpContext context)
+    public async Task InvokeAsync(HttpContext context, IProblemDetailsService problemDetailsService)
     {
         try
         {
@@ -24,33 +25,45 @@ public class ExceptionHandlingMiddleware
         }
         catch (AppException exception)
         {
-            await WriteErrorResponse(context, exception.StatusCode, exception.Message);
+            await WriteProblemDetails(
+                context,
+                problemDetailsService,
+                exception.StatusCode,
+                exception.Message);
         }
         catch (Exception exception)
         {
             _logger.LogError(exception, "Unhandled exception");
 
-            await WriteErrorResponse(
+            await WriteProblemDetails(
                 context,
+                problemDetailsService,
                 StatusCodes.Status500InternalServerError,
                 "Internal server error");
         }
     }
 
-    private static async Task WriteErrorResponse(
-        HttpContext context,
+    private static async Task WriteProblemDetails(HttpContext context,
+        IProblemDetailsService problemDetailsService,
         int statusCode,
-        string message)
+        string detail)
     {
-        context.Response.ContentType = "application/json";
         context.Response.StatusCode = statusCode;
 
-        var response = new
+        var problemDetails = new ProblemDetails
         {
-            statusCode,
-            message
+            Type = "about:blank",
+            Title = ReasonPhrases.GetReasonPhrase(statusCode),
+            Status = statusCode,
+            Detail = detail,
+            Instance = context.Request.Path
         };
 
-        await context.Response.WriteAsync(JsonSerializer.Serialize(response));
+        await problemDetailsService.WriteAsync(
+            new ProblemDetailsContext
+            {
+                HttpContext = context,
+                ProblemDetails = problemDetails
+            });
     }
 }

@@ -20,11 +20,11 @@ public class ProductController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<List<ProductResponse>>> GetAllProducts([FromQuery] GetProductsFilters filters, CancellationToken cancellationToken)
+    public async Task<ActionResult<PagedResult<ProductResponse>>> GetAllProducts([FromQuery] GetProductsFilters filters, CancellationToken cancellationToken)
     {
         var products = await _productService.GetProducts(filters, cancellationToken);
         
-        return Ok(products.ToResponse());
+        return Ok(products);
     }
     
     [HttpGet("{id:int}")]
@@ -47,7 +47,7 @@ public class ProductController : ControllerBase
     }
     
     [HttpPatch("{id:int}/status")]
-    public async Task<ActionResult<ProductResponse>> ChangeProductStatus([FromRoute] int id, [FromQuery] Status? status, CancellationToken cancellationToken)
+    public async Task<ActionResult<ProductResponse>> ChangeProductStatus([FromRoute] int id, Status? status, CancellationToken cancellationToken)
     {
         if (status is null)
             throw new ValidationException("Status must be provided");

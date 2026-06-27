@@ -48,4 +48,14 @@ public class CategoryRepository : ICategoryRepository
         
         return savedCategory.ToDomain();
     }
+
+    public async Task<bool> ExistsById(int id, CancellationToken cancellationToken)
+    {
+        await using var dbContext =
+            await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+
+        return await dbContext.Categories
+            .AsNoTracking()
+            .AnyAsync(category => category.Id == id, cancellationToken);
+    }
 }

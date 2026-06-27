@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
 using TestProjectMTech.Api.Data;
@@ -11,7 +12,21 @@ using TestProjectMTech.Api.Services.Policies;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(options => 
+    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter())
+    );
+builder.Services.AddProblemDetails(options =>
+{
+    options.CustomizeProblemDetails = context =>
+    {
+        context.ProblemDetails.Instance ??=
+            context.HttpContext.Request.Path;
+
+        context.ProblemDetails.Extensions.TryAdd(
+            "traceId",
+            context.HttpContext.TraceIdentifier);
+    };
+});
 builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo { Title = "TestProjectMTech", Version = "v1" });
@@ -44,6 +59,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
+app.UseStatusCodePages();
 app.UseHttpsRedirection();
 app.MapControllers();
 
