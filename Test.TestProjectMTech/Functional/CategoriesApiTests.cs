@@ -19,7 +19,7 @@ public class CategoriesApiTests : FunctionalTestBase
         var categories = await response.Content.ReadFromJsonAsync<List<CategoryResponse>>();
         categories.Should().NotBeNull();
         categories.Should().HaveCount(3);
-        categories!.Select(category => category.Name).Should().BeEquivalentTo(
+        categories.Select(category => category.Name).Should().BeEquivalentTo(
             "Телевизоры",
             "Смартфоны",
             "Ноутбуки");
@@ -34,7 +34,7 @@ public class CategoriesApiTests : FunctionalTestBase
 
         var category = await response.Content.ReadFromJsonAsync<CategoryResponse>();
         category.Should().NotBeNull();
-        category!.Id.Should().Be(1);
+        category.Id.Should().Be(1);
         category.Name.Should().Be("Телевизоры");
     }
 
@@ -60,7 +60,7 @@ public class CategoriesApiTests : FunctionalTestBase
 
         var category = await response.Content.ReadFromJsonAsync<CategoryResponse>();
         category.Should().NotBeNull();
-        category!.Id.Should().BeGreaterThan(0);
+        category.Id.Should().BeGreaterThan(0);
         category.Name.Should().Be("Аэрогрили");
         response.Headers.Location.Should().NotBeNull();
         response.Headers.Location!.ToString().Should().EndWith($"/api/categories/{category.Id}");

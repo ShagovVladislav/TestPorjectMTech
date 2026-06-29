@@ -19,7 +19,8 @@ public abstract class RepositoryTestBase
     [TearDown]
     public async Task TearDown()
     {
-        await _database.DisposeAsync();
+        if (_database is not null)
+            await _database.DisposeAsync();
     }
 
     protected WarehouseDbContext CreateContext()

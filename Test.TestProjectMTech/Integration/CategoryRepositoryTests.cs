@@ -29,7 +29,7 @@ public class CategoryRepositoryTests : RepositoryTestBase
         var result = await repository.GetCategoryById(1, CancellationToken.None);
 
         result.Should().NotBeNull();
-        result!.Id.Should().Be(1);
+        result.Id.Should().Be(1);
         result.Name.Should().Be("Телевизоры");
     }
 
@@ -64,5 +64,25 @@ public class CategoryRepositoryTests : RepositoryTestBase
             .SingleAsync(category => category.Id == result.Id);
 
         savedCategory.Name.Should().Be("Аэрогрили");
+    }
+
+    [Test]
+    public async Task ExistsById_Should_Return_True_When_Category_Exists()
+    {
+        var repository = CreateCategoryRepository();
+
+        var result = await repository.ExistsById(1, CancellationToken.None);
+
+        result.Should().BeTrue();
+    }
+
+    [Test]
+    public async Task ExistsById_Should_Return_False_When_Category_Does_Not_Exist()
+    {
+        var repository = CreateCategoryRepository();
+
+        var result = await repository.ExistsById(999, CancellationToken.None);
+
+        result.Should().BeFalse();
     }
 }

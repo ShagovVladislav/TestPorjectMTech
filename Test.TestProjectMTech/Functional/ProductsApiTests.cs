@@ -17,10 +17,14 @@ public class ProductsApiTests : FunctionalTestBase
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var products = await response.Content.ReadFromJsonAsync<List<ProductResponse>>();
-        products.Should().NotBeNull();
-        products.Should().HaveCount(5);
-        products!.Select(product => product.Sku).Should().BeEquivalentTo(
+        var result = await ReadJsonAsync<PagedResult<ProductResponse>>(response);
+        result.Should().NotBeNull();
+        result.Items.Should().HaveCount(5);
+        result.TotalCount.Should().Be(5);
+        result.Page.Should().Be(1);
+        result.PageSize.Should().Be(20);
+        result.TotalPages.Should().Be(1);
+        result.Items.Select(product => product.Sku).Should().BeEquivalentTo(
             "TV-SAMSUNG-001",
             "TV-LG-001",
             "PHONE-XIAOMI-001",
@@ -35,10 +39,11 @@ public class ProductsApiTests : FunctionalTestBase
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var products = await response.Content.ReadFromJsonAsync<List<ProductResponse>>();
-        products.Should().NotBeNull();
-        products.Should().HaveCount(2);
-        products.Should().OnlyContain(product => product.CategoryId == 1);
+        var result = await ReadJsonAsync<PagedResult<ProductResponse>>(response);
+        result.Should().NotBeNull();
+        result.Items.Should().HaveCount(2);
+        result.TotalCount.Should().Be(2);
+        result.Items.Should().OnlyContain(product => product.CategoryId == 1);
     }
 
     [Test]
@@ -48,10 +53,11 @@ public class ProductsApiTests : FunctionalTestBase
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var products = await response.Content.ReadFromJsonAsync<List<ProductResponse>>();
-        products.Should().NotBeNull();
-        products.Should().HaveCount(2);
-        products.Should().OnlyContain(product => product.Status == Status.Active);
+        var result = await ReadJsonAsync<PagedResult<ProductResponse>>(response);
+        result.Should().NotBeNull();
+        result.Items.Should().HaveCount(2);
+        result.TotalCount.Should().Be(2);
+        result.Items.Should().OnlyContain(product => product.Status == Status.Active);
     }
 
     [Test]
@@ -61,10 +67,14 @@ public class ProductsApiTests : FunctionalTestBase
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var products = await response.Content.ReadFromJsonAsync<List<ProductResponse>>();
-        products.Should().NotBeNull();
-        products.Should().HaveCount(2);
-        products!.Select(product => product.Sku).Should().ContainInOrder(
+        var result = await ReadJsonAsync<PagedResult<ProductResponse>>(response);
+        result.Should().NotBeNull();
+        result.Items.Should().HaveCount(2);
+        result.Page.Should().Be(2);
+        result.PageSize.Should().Be(2);
+        result.TotalCount.Should().Be(5);
+        result.TotalPages.Should().Be(3);
+        result.Items.Select(product => product.Sku).Should().ContainInOrder(
             "PHONE-XIAOMI-001",
             "PHONE-SAMSUNG-001");
     }
@@ -84,9 +94,9 @@ public class ProductsApiTests : FunctionalTestBase
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var product = await response.Content.ReadFromJsonAsync<ProductResponse>();
+        var product = await ReadJsonAsync<ProductResponse>(response);
         product.Should().NotBeNull();
-        product!.Id.Should().Be(1);
+        product.Id.Should().Be(1);
         product.Name.Should().Be("Телевизор Samsung");
         product.Sku.Should().Be("TV-SAMSUNG-001");
         product.Status.Should().Be(Status.Active);
@@ -114,9 +124,9 @@ public class ProductsApiTests : FunctionalTestBase
 
         response.StatusCode.Should().Be(HttpStatusCode.Created);
 
-        var product = await response.Content.ReadFromJsonAsync<ProductResponse>();
+        var product = await ReadJsonAsync<ProductResponse>(response);
         product.Should().NotBeNull();
-        product!.Id.Should().BeGreaterThan(0);
+        product.Id.Should().BeGreaterThan(0);
         product.Name.Should().Be("Планшет Huawei");
         product.Sku.Should().Be("TABLET-HUAWEI-001");
         product.CategoryId.Should().Be(2);
@@ -175,9 +185,9 @@ public class ProductsApiTests : FunctionalTestBase
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var product = await response.Content.ReadFromJsonAsync<ProductResponse>();
+        var product = await ReadJsonAsync<ProductResponse>(response);
         product.Should().NotBeNull();
-        product!.Id.Should().Be(1);
+        product.Id.Should().Be(1);
         product.Status.Should().Be(Status.Defective);
     }
 

@@ -16,8 +16,12 @@ public class ProductRepositoryTests : RepositoryTestBase
 
         var result = await repository.GetProducts(new GetProductsFilters(), CancellationToken.None);
 
-        result.Should().HaveCount(5);
-        result.Select(product => product.Sku).Should().BeEquivalentTo(
+        result.Items.Should().HaveCount(5);
+        result.TotalCount.Should().Be(5);
+        result.Page.Should().Be(1);
+        result.PageSize.Should().Be(20);
+        result.TotalPages.Should().Be(1);
+        result.Items.Select(product => product.Sku).Should().BeEquivalentTo(
             "TV-SAMSUNG-001",
             "TV-LG-001",
             "PHONE-XIAOMI-001",
@@ -37,8 +41,12 @@ public class ProductRepositoryTests : RepositoryTestBase
             },
             CancellationToken.None);
 
-        result.Should().HaveCount(2);
-        result.Should().OnlyContain(product => product.CategoryId == 1);
+        result.Items.Should().HaveCount(2);
+        result.TotalCount.Should().Be(2);
+        result.Page.Should().Be(1);
+        result.PageSize.Should().Be(20);
+        result.TotalPages.Should().Be(1);
+        result.Items.Should().OnlyContain(product => product.CategoryId == 1);
     }
 
     [Test]
@@ -53,8 +61,12 @@ public class ProductRepositoryTests : RepositoryTestBase
             },
             CancellationToken.None);
 
-        result.Should().HaveCount(2);
-        result.Should().OnlyContain(product => product.Status == Status.Active);
+        result.Items.Should().HaveCount(2);
+        result.TotalCount.Should().Be(2);
+        result.Page.Should().Be(1);
+        result.PageSize.Should().Be(20);
+        result.TotalPages.Should().Be(1);
+        result.Items.Should().OnlyContain(product => product.Status == Status.Active);
     }
 
     [Test]
@@ -70,8 +82,12 @@ public class ProductRepositoryTests : RepositoryTestBase
             },
             CancellationToken.None);
 
-        result.Should().HaveCount(2);
-        result.Select(product => product.Sku).Should().ContainInOrder(
+        result.Items.Should().HaveCount(2);
+        result.TotalCount.Should().Be(5);
+        result.Page.Should().Be(2);
+        result.PageSize.Should().Be(2);
+        result.TotalPages.Should().Be(3);
+        result.Items.Select(product => product.Sku).Should().ContainInOrder(
             "PHONE-XIAOMI-001",
             "PHONE-SAMSUNG-001");
     }
@@ -90,8 +106,12 @@ public class ProductRepositoryTests : RepositoryTestBase
             },
             CancellationToken.None);
 
-        result.Should().ContainSingle();
-        result[0].Sku.Should().Be("TV-LG-001");
+        result.Items.Should().ContainSingle();
+        result.TotalCount.Should().Be(2);
+        result.Page.Should().Be(2);
+        result.PageSize.Should().Be(1);
+        result.TotalPages.Should().Be(2);
+        result.Items[0].Sku.Should().Be("TV-LG-001");
     }
 
     [Test]
@@ -151,7 +171,7 @@ public class ProductRepositoryTests : RepositoryTestBase
     }
 
     [Test]
-    public async Task CreateProduct_Should_Throw_NotFoundException_When_Category_Does_Not_Exist()
+    public async Task CreateProduct_Should_Throw_DbUpdateException_When_Category_Does_Not_Exist()
     {
         var repository = CreateProductRepository();
 
@@ -165,8 +185,7 @@ public class ProductRepositoryTests : RepositoryTestBase
             },
             CancellationToken.None);
 
-        await act.Should().ThrowAsync<NotFoundException>()
-            .WithMessage("Category with id 999 was not found");
+        await act.Should().ThrowAsync<DbUpdateException>();
     }
 
     [Test]
@@ -186,6 +205,26 @@ public class ProductRepositoryTests : RepositoryTestBase
 
         await act.Should().ThrowAsync<ConflictException>()
             .WithMessage("Product with SKU 'TV-SAMSUNG-001' already exists");
+    }
+
+    [Test]
+    public async Task ExistsBySku_Should_Return_True_When_Product_Exists()
+    {
+        var repository = CreateProductRepository();
+
+        var result = await repository.ExistsBySku("TV-SAMSUNG-001", CancellationToken.None);
+
+        result.Should().BeTrue();
+    }
+
+    [Test]
+    public async Task ExistsBySku_Should_Return_False_When_Product_Does_Not_Exist()
+    {
+        var repository = CreateProductRepository();
+
+        var result = await repository.ExistsBySku("UNKNOWN-SKU", CancellationToken.None);
+
+        result.Should().BeFalse();
     }
 
     [Test]

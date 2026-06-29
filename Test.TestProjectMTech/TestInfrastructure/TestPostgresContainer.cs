@@ -9,6 +9,11 @@ public static class TestPostgresContainer
 
     public static async Task<string> GetConnectionStringAsync()
     {
+        var configuredConnectionString = Environment.GetEnvironmentVariable("TEST_DB_CONNECTION_STRING");
+
+        if (!string.IsNullOrWhiteSpace(configuredConnectionString))
+            return configuredConnectionString;
+
         if (_container is not null)
             return _container.GetConnectionString();
 

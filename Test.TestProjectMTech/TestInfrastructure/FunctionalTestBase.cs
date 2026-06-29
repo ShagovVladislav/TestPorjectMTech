@@ -1,7 +1,12 @@
+using System.Net.Http.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+
 namespace Test.TestProjectMTech.TestInfrastructure;
 
 public abstract class FunctionalTestBase
 {
+    private static readonly JsonSerializerOptions SerializerOptions = CreateSerializerOptions();
     private DatabaseFixture _database = null!;
     private CustomWebApplicationFactory _factory = null!;
 
@@ -27,5 +32,17 @@ public abstract class FunctionalTestBase
         
         if (_database is not null)
             await _database.DisposeAsync();
+    }
+
+    protected static Task<T?> ReadJsonAsync<T>(HttpResponseMessage response)
+    {
+        return response.Content.ReadFromJsonAsync<T>(SerializerOptions);
+    }
+
+    private static JsonSerializerOptions CreateSerializerOptions()
+    {
+        var options = new JsonSerializerOptions(JsonSerializerDefaults.Web);
+        options.Converters.Add(new JsonStringEnumConverter());
+        return options;
     }
 }
